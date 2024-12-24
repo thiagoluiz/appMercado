@@ -127,8 +127,17 @@
             items.push(newItem);
             localStorage.setItem('items', JSON.stringify(items));
             renderItems();
-            clearForm();
+            clearForm(); // Limpar os campos após adicionar o item
         });
+
+        // Limpar Formulário
+        function clearForm() {
+            itemName.value = '';
+            itemQuantity.value = 1;
+            itemValue.value = '';
+            itemTotal.value = '';
+            itemName.focus(); // Foca no campo Nome do Item
+        }
 
         // Atualizar Dinheiro Disponível
         updateMoneyButton.addEventListener('click', () => {
