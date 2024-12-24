@@ -182,11 +182,14 @@
             remainingBalance.textContent = remaining.toFixed(2);
         }
 
-        updateMoneyButton.addEventListener('click', () => {
-            money = parseFloat(availableMoney.value) || 0;
-            localStorage.setItem('money', money);
-            calculateRemainingBalance();
-        });
+        function renderItems() {
+            itemTableBody.innerHTML = '';
+            cardContainer.innerHTML = '';
+            items.forEach((item) => {
+                itemTableBody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.value}</td><td>${item.total}</td></tr>`;
+            });
+            calculateGrandTotal();
+        }
 
         renderItems();
     </script>
