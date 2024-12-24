@@ -150,24 +150,55 @@
     </div>
 
     <script>
+        let items = JSON.parse(localStorage.getItem('items')) || [];
+        let money = parseFloat(localStorage.getItem('money')) || 0;
+
+        const itemName = document.getElementById('itemName');
         const itemQuantity = document.getElementById('itemQuantity');
         const itemValue = document.getElementById('itemValue');
         const itemTotal = document.getElementById('itemTotal');
+        const itemTableBody = document.getElementById('itemTableBody');
+        const grandTotal = document.getElementById('grandTotal');
+        const grandTotalMobile = document.getElementById('grandTotalMobile');
+        const remainingBalance = document.getElementById('remainingBalance');
 
-        // Função para calcular o total do item
         function calculateTotal() {
             const quantity = parseFloat(itemQuantity.value) || 0;
             const value = parseFloat(itemValue.value) || 0;
-            const total = quantity * value;
-            itemTotal.value = total.toFixed(2);
+            itemTotal.value = (quantity * value).toFixed(2);
         }
 
-        // Adicionar eventos para calcular Total Item
+        function calculateGrandTotal() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            grandTotal.textContent = total.toFixed(2);
+            grandTotalMobile.textContent = total.toFixed(2);
+            remainingBalance.textContent = (money - total).toFixed(2);
+            localStorage.setItem('items', JSON.stringify(items));
+        }
+
+        document.getElementById('addItem').addEventListener('click', () => {
+            const newItem = {
+                name: itemName.value,
+                quantity: parseInt(itemQuantity.value),
+                value: parseFloat(itemValue.value),
+                total: parseFloat(itemTotal.value)
+            };
+            items.push(newItem);
+            calculateGrandTotal();
+            renderItems();
+        });
+
+        function renderItems() {
+            itemTableBody.innerHTML = '';
+            items.forEach(item => {
+                itemTableBody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.value}</td><td>${item.total}</td></tr>`;
+            });
+        }
+
         itemQuantity.addEventListener('input', calculateTotal);
         itemValue.addEventListener('input', calculateTotal);
 
-        // Garantir que o valor inicial seja exibido corretamente
-        calculateTotal();
+        renderItems();
     </script>
 </body>
 </html>
