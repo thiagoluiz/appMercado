@@ -98,7 +98,12 @@
 
         let items = JSON.parse(localStorage.getItem('items')) || [];
         let money = parseFloat(localStorage.getItem('money')) || 0;
+        let totalGeneral = parseFloat(localStorage.getItem('totalGeneral')) || 0;
+        let remaining = parseFloat(localStorage.getItem('remaining')) || 0;
+
         availableMoney.value = money;
+        grandTotal.textContent = totalGeneral.toFixed(2);
+        remainingBalance.textContent = remaining.toFixed(2);
 
         itemQuantity.addEventListener('input', calculateTotal);
         itemValue.addEventListener('input', calculateTotal);
@@ -107,6 +112,19 @@
             const quantity = parseFloat(itemQuantity.value) || 0;
             const value = parseFloat(itemValue.value) || 0;
             itemTotal.value = (quantity * value).toFixed(2);
+        }
+
+        function calculateGrandTotal() {
+            totalGeneral = items.reduce((sum, item) => sum + item.total, 0);
+            grandTotal.textContent = totalGeneral.toFixed(2);
+            localStorage.setItem('totalGeneral', totalGeneral);
+            calculateRemainingBalance();
+        }
+
+        function calculateRemainingBalance() {
+            remaining = money - totalGeneral;
+            remainingBalance.textContent = remaining.toFixed(2);
+            localStorage.setItem('remaining', remaining);
         }
 
         addItemButton.addEventListener('click', () => {
@@ -135,23 +153,12 @@
             clearForm();
         });
 
-        function editItem(index) {
-            const item = items[index];
-            itemName.value = item.name;
-            itemQuantity.value = item.quantity;
-            itemValue.value = item.value;
-            itemTotal.value = item.total;
-            editIndex = index;
-            addItemButton.textContent = 'Salvar Edição';
-        }
-
-        function deleteItem(index) {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
-                items.splice(index, 1);
-                localStorage.setItem('items', JSON.stringify(items));
-                renderItems();
-            }
-        }
+        updateMoneyButton.addEventListener('click', () => {
+            money = parseFloat(availableMoney.value) || 0;
+            localStorage.setItem('money', money);
+            calculateRemainingBalance();
+            alert('Orçamento atualizado com sucesso!');
+        });
 
         function renderItems() {
             itemTableBody.innerHTML = '';
@@ -169,6 +176,14 @@
                     </tr>`;
             });
             calculateGrandTotal();
+        }
+
+        function clearForm() {
+            itemName.value = '';
+            itemQuantity.value = 1;
+            itemValue.value = '';
+            itemTotal.value = '';
+            itemName.focus();
         }
 
         renderItems();
