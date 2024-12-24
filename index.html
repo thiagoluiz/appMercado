@@ -84,6 +84,7 @@
     </div>
 
     <script>
+        let editIndex = null;
         const itemName = document.getElementById('itemName');
         const itemQuantity = document.getElementById('itemQuantity');
         const itemValue = document.getElementById('itemValue');
@@ -99,42 +100,38 @@
         let money = parseFloat(localStorage.getItem('money')) || 0;
         availableMoney.value = money;
 
-        itemQuantity.addEventListener('input', calculateTotal);
-        itemValue.addEventListener('input', calculateTotal);
-
-        function calculateTotal() {
-            const quantity = parseFloat(itemQuantity.value) || 0;
-            const value = parseFloat(itemValue.value) || 0;
-            itemTotal.value = (quantity * value).toFixed(2);
-        }
-
-        function calculateGrandTotal() {
-            const total = items.reduce((sum, item) => sum + item.total, 0);
-            grandTotal.textContent = total.toFixed(2);
-            calculateRemainingBalance();
-        }
-
-        function calculateRemainingBalance() {
-            const total = items.reduce((sum, item) => sum + item.total, 0);
-            const remaining = money - total;
-            remainingBalance.textContent = remaining.toFixed(2);
-        }
-
         addItemButton.addEventListener('click', () => {
             if (!itemName.value || !itemQuantity.value || !itemValue.value) {
                 alert('Preencha todos os campos!');
                 return;
             }
-            items.push({
+            const newItem = {
                 name: itemName.value,
                 quantity: parseInt(itemQuantity.value),
                 value: parseFloat(itemValue.value),
                 total: parseFloat(itemTotal.value)
-            });
+            };
+            if (editIndex !== null) {
+                items[editIndex] = newItem;
+                editIndex = null;
+                addItemButton.textContent = 'Adicionar Item';
+            } else {
+                items.push(newItem);
+            }
             localStorage.setItem('items', JSON.stringify(items));
             renderItems();
             clearForm();
         });
+
+        function editItem(index) {
+            const item = items[index];
+            itemName.value = item.name;
+            itemQuantity.value = item.quantity;
+            itemValue.value = item.value;
+            itemTotal.value = item.total;
+            editIndex = index;
+            addItemButton.textContent = 'Salvar Edição';
+        }
 
         function deleteItem(index) {
             if (confirm('Tem certeza que deseja excluir este item?')) {
@@ -153,7 +150,10 @@
                         <td>${item.quantity}</td>
                         <td>${item.value.toFixed(2)}</td>
                         <td>${item.total.toFixed(2)}</td>
-                        <td><button class="btn btn-sm btn-danger" onclick="deleteItem(${index})">Excluir</button></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editItem(${index})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem(${index})">Excluir</button>
+                        </td>
                     </tr>`;
             });
             calculateGrandTotal();
