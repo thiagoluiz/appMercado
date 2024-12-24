@@ -123,6 +123,27 @@
             clearForm();
         });
 
+        function calculateTotal() {
+            const quantity = parseFloat(itemQuantity.value) || 0;
+            const value = parseFloat(itemValue.value) || 0;
+            itemTotal.value = (quantity * value).toFixed(2);
+        }
+
+        itemQuantity.addEventListener('input', calculateTotal);
+        itemValue.addEventListener('input', calculateTotal);
+
+        function calculateGrandTotal() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            grandTotal.textContent = total.toFixed(2);
+            calculateRemainingBalance();
+        }
+
+        function calculateRemainingBalance() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            const remaining = money - total;
+            remainingBalance.textContent = remaining.toFixed(2);
+        }
+
         function editItem(index) {
             const item = items[index];
             itemName.value = item.name;
@@ -157,6 +178,14 @@
                     </tr>`;
             });
             calculateGrandTotal();
+        }
+
+        function clearForm() {
+            itemName.value = '';
+            itemQuantity.value = 1;
+            itemValue.value = '';
+            itemTotal.value = '';
+            itemName.focus();
         }
 
         renderItems();
