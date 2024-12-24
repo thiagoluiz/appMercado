@@ -153,20 +153,12 @@
         let items = JSON.parse(localStorage.getItem('items')) || [];
         let money = parseFloat(localStorage.getItem('money')) || 0;
 
-        const itemName = document.getElementById('itemName');
-        const itemQuantity = document.getElementById('itemQuantity');
-        const itemValue = document.getElementById('itemValue');
-        const itemTotal = document.getElementById('itemTotal');
-        const itemTableBody = document.getElementById('itemTableBody');
+        const availableMoney = document.getElementById('availableMoney');
+        const remainingBalance = document.getElementById('remainingBalance');
         const grandTotal = document.getElementById('grandTotal');
         const grandTotalMobile = document.getElementById('grandTotalMobile');
-        const remainingBalance = document.getElementById('remainingBalance');
 
-        function calculateTotal() {
-            const quantity = parseFloat(itemQuantity.value) || 0;
-            const value = parseFloat(itemValue.value) || 0;
-            itemTotal.value = (quantity * value).toFixed(2);
-        }
+        availableMoney.value = money;
 
         function calculateGrandTotal() {
             const total = items.reduce((sum, item) => sum + item.total, 0);
@@ -176,28 +168,20 @@
             localStorage.setItem('items', JSON.stringify(items));
         }
 
-        document.getElementById('addItem').addEventListener('click', () => {
-            const newItem = {
-                name: itemName.value,
-                quantity: parseInt(itemQuantity.value),
-                value: parseFloat(itemValue.value),
-                total: parseFloat(itemTotal.value)
-            };
-            items.push(newItem);
-            localStorage.setItem('items', JSON.stringify(items));
+        document.getElementById('updateMoney').addEventListener('click', () => {
+            money = parseFloat(availableMoney.value) || 0;
+            localStorage.setItem('money', money);
             calculateGrandTotal();
-            renderItems();
         });
 
         function renderItems() {
+            const itemTableBody = document.getElementById('itemTableBody');
             itemTableBody.innerHTML = '';
             items.forEach(item => {
                 itemTableBody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.value}</td><td>${item.total}</td></tr>`;
             });
+            calculateGrandTotal();
         }
-
-        itemQuantity.addEventListener('input', calculateTotal);
-        itemValue.addEventListener('input', calculateTotal);
 
         renderItems();
     </script>
