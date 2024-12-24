@@ -184,6 +184,7 @@
                 total: parseFloat(itemTotal.value)
             };
             items.push(newItem);
+            localStorage.setItem('items', JSON.stringify(items));
             calculateGrandTotal();
             renderItems();
         });
