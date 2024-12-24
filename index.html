@@ -144,6 +144,27 @@
 
         availableMoney.value = money;
 
+        itemQuantity.addEventListener('input', calculateTotal);
+        itemValue.addEventListener('input', calculateTotal);
+
+        function calculateTotal() {
+            const quantity = parseFloat(itemQuantity.value) || 0;
+            const value = parseFloat(itemValue.value) || 0;
+            itemTotal.value = (quantity * value).toFixed(2);
+        }
+
+        function calculateGrandTotal() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            grandTotal.textContent = total.toFixed(2);
+            calculateRemainingBalance();
+        }
+
+        function calculateRemainingBalance() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            const remaining = money - total;
+            remainingBalance.textContent = remaining.toFixed(2);
+        }
+
         addItemButton.addEventListener('click', () => {
             const newItem = {
                 name: itemName.value,
@@ -159,14 +180,13 @@
         function renderItems() {
             itemTableBody.innerHTML = '';
             cardContainer.innerHTML = '';
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 itemTableBody.innerHTML += `
                     <tr>
                         <td>${item.name}</td>
                         <td>${item.quantity}</td>
                         <td>${item.value.toFixed(2)}</td>
                         <td>${item.total.toFixed(2)}</td>
-                        <td><button class="btn btn-sm btn-danger">Excluir</button></td>
                     </tr>`;
                 cardContainer.innerHTML += `
                     <div class="item-card">
@@ -174,12 +194,9 @@
                         <p>Quantidade: ${item.quantity}</p>
                         <p>Valor Unitário: ${item.value.toFixed(2)}</p>
                         <p>Total Item: ${item.total.toFixed(2)}</p>
-                        <div class="card-actions">
-                            <button class="btn btn-sm btn-warning">Editar</button>
-                            <button class="btn btn-sm btn-danger">Excluir</button>
-                        </div>
                     </div>`;
             });
+            calculateGrandTotal();
         }
 
         renderItems();
