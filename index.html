@@ -43,6 +43,14 @@
             .card-actions button {
                 margin-left: 5px;
             }
+
+            .total-container-mobile {
+                display: block;
+                text-align: right;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 15px;
+            }
         }
 
         /* Estilo para telas maiores */
@@ -52,6 +60,10 @@
             }
 
             .card-container {
+                display: none;
+            }
+
+            .total-container-mobile {
                 display: none;
             }
         }
@@ -109,6 +121,9 @@
 
         <!-- Cards para Mobile -->
         <div class="card-container" id="cardContainer"></div>
+        <div class="total-container-mobile">
+            <h5>Total Geral: <span id="grandTotalMobile">0.00</span></h5>
+        </div>
 
         <h4 class="mt-5">Orçamento</h4>
         <div class="row g-3 align-items-center">
@@ -135,6 +150,7 @@
         const itemTableBody = document.getElementById('itemTableBody');
         const cardContainer = document.getElementById('cardContainer');
         const grandTotal = document.getElementById('grandTotal');
+        const grandTotalMobile = document.getElementById('grandTotalMobile');
         const availableMoney = document.getElementById('availableMoney');
         const updateMoneyButton = document.getElementById('updateMoney');
         const remainingBalance = document.getElementById('remainingBalance');
@@ -155,7 +171,8 @@
 
         function calculateGrandTotal() {
             const total = items.reduce((sum, item) => sum + item.total, 0);
-            grandTotal.textContent = total.toFixed(2);
+            grandTotal.textContent = total.toFixed(2); // Desktop
+            grandTotalMobile.textContent = total.toFixed(2); // Mobile
             calculateRemainingBalance();
         }
 
