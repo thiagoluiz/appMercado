@@ -142,6 +142,9 @@
 
     <script>
         let editIndex = null;
+        let items = JSON.parse(localStorage.getItem('items')) || [];
+        let money = parseFloat(localStorage.getItem('money')) || 0;
+
         const itemName = document.getElementById('itemName');
         const itemQuantity = document.getElementById('itemQuantity');
         const itemValue = document.getElementById('itemValue');
@@ -155,37 +158,28 @@
         const updateMoneyButton = document.getElementById('updateMoney');
         const remainingBalance = document.getElementById('remainingBalance');
 
-        let items = JSON.parse(localStorage.getItem('items')) || [];
-        let money = parseFloat(localStorage.getItem('money')) || 0;
-
-        availableMoney.value = money;
-
-        itemQuantity.addEventListener('input', calculateTotal);
-        itemValue.addEventListener('input', calculateTotal);
-
         function calculateTotal() {
-            const quantity = parseFloat(itemQuantity.value) || 0;
-            const value = parseFloat(itemValue.value) || 0;
-            itemTotal.value = (quantity * value).toFixed(2);
+            itemTotal.value = (itemQuantity.value * itemValue.value).toFixed(2);
         }
 
         function calculateGrandTotal() {
             const total = items.reduce((sum, item) => sum + item.total, 0);
             grandTotal.textContent = total.toFixed(2);
             grandTotalMobile.textContent = total.toFixed(2);
-            calculateRemainingBalance();
+            remainingBalance.textContent = (money - total).toFixed(2);
+            localStorage.setItem('money', money);
         }
 
-        function calculateRemainingBalance() {
-            const total = items.reduce((sum, item) => sum + item.total, 0);
-            const remaining = money - total;
-            remainingBalance.textContent = remaining.toFixed(2);
-        }
+        addItemButton.addEventListener('click', () => {
+            const newItem = { name: itemName.value, quantity: +itemQuantity.value, value: +itemValue.value, total: +itemTotal.value };
+            items.push(newItem);
+            localStorage.setItem('items', JSON.stringify(items));
+            renderItems();
+        });
 
         function renderItems() {
             itemTableBody.innerHTML = '';
-            cardContainer.innerHTML = '';
-            items.forEach((item) => {
+            items.forEach((item, index) => {
                 itemTableBody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.value}</td><td>${item.total}</td></tr>`;
             });
             calculateGrandTotal();
