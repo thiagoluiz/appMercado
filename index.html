@@ -47,7 +47,7 @@
         
         <h4 class="mt-5">Lista de Itens</h4>
         <div class="table-responsive">
-            <table class="table table-bordered mt-3">
+            <table class="table table-bordered table-striped mt-3">
                 <thead>
                     <tr>
                         <th>Nome do Item</th>
@@ -100,7 +100,6 @@
         let money = parseFloat(localStorage.getItem('money')) || 0;
         availableMoney.value = money;
 
-        // Calcular total item automaticamente
         itemQuantity.addEventListener('input', calculateTotal);
         itemValue.addEventListener('input', calculateTotal);
 
@@ -110,7 +109,6 @@
             itemTotal.value = (quantity * value).toFixed(2);
         }
 
-        // Adicionar ou editar item
         addItemButton.addEventListener('click', () => {
             if (!itemName.value || !itemQuantity.value || !itemValue.value) {
                 alert('Preencha todos os campos!');
@@ -125,12 +123,10 @@
             };
 
             if (editIndex !== null) {
-                // Editar item existente
                 items[editIndex] = newItem;
                 editIndex = null;
                 addItemButton.textContent = 'Adicionar Item';
             } else {
-                // Adicionar novo item
                 items.push(newItem);
             }
 
@@ -139,7 +135,6 @@
             clearForm();
         });
 
-        // Editar item
         function editItem(index) {
             const item = items[index];
             itemName.value = item.name;
@@ -150,42 +145,12 @@
             addItemButton.textContent = 'Salvar Edição';
         }
 
-        // Excluir item
         function deleteItem(index) {
             if (confirm('Tem certeza que deseja excluir este item?')) {
                 items.splice(index, 1);
                 localStorage.setItem('items', JSON.stringify(items));
                 renderItems();
             }
-        }
-
-        // Calcular totais
-        function calculateGrandTotal() {
-            const total = items.reduce((sum, item) => sum + item.total, 0);
-            grandTotal.textContent = total.toFixed(2);
-            calculateRemainingBalance();
-        }
-
-        function calculateRemainingBalance() {
-            const total = items.reduce((sum, item) => sum + item.total, 0);
-            const remaining = money - total;
-            remainingBalance.textContent = remaining.toFixed(2);
-        }
-
-        // Atualizar orçamento
-        updateMoneyButton.addEventListener('click', () => {
-            money = parseFloat(availableMoney.value) || 0;
-            localStorage.setItem('money', money);
-            calculateRemainingBalance();
-            alert('Orçamento atualizado com sucesso!');
-        });
-
-        function clearForm() {
-            itemName.value = '';
-            itemQuantity.value = 1;
-            itemValue.value = '';
-            itemTotal.value = '';
-            itemName.focus();
         }
 
         function renderItems() {
