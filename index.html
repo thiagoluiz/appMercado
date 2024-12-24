@@ -53,6 +53,20 @@
                 </tr>
             </tfoot>
         </table>
+
+        <h4 class="mt-5">Orçamento</h4>
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label for="availableMoney" class="form-label">Dinheiro Disponível</label>
+                <input type="number" class="form-control" id="availableMoney" min="0" step="0.01" required>
+            </div>
+            <div class="col-md-3 align-self-end">
+                <button type="button" class="btn btn-success w-100" id="updateMoney">Atualizar Orçamento</button>
+            </div>
+            <div class="col-md-5">
+                <h5>Saldo Restante: <span id="remainingBalance">0.00</span></h5>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -64,9 +78,14 @@
         const addItemButton = document.getElementById('addItem');
         const itemTableBody = document.getElementById('itemTableBody');
         const grandTotal = document.getElementById('grandTotal');
-        
+        const availableMoney = document.getElementById('availableMoney');
+        const updateMoneyButton = document.getElementById('updateMoney');
+        const remainingBalance = document.getElementById('remainingBalance');
+
         let items = JSON.parse(localStorage.getItem('items')) || [];
-        
+        let money = parseFloat(localStorage.getItem('money')) || 0;
+        availableMoney.value = money;
+
         // Atualiza Total Item automaticamente
         itemQuantity.addEventListener('input', calculateTotal);
         itemValue.addEventListener('input', calculateTotal);
@@ -77,33 +96,20 @@
             itemTotal.value = (quantity * value).toFixed(2);
         }
         
-        // Função para calcular Total Geral
+        // Função para calcular o Total Geral
         function calculateGrandTotal() {
             const total = items.reduce((sum, item) => sum + item.total, 0);
             grandTotal.textContent = total.toFixed(2);
+            calculateRemainingBalance();
         }
-        
-        // Renderizar Itens
-        function renderItems() {
-            itemTableBody.innerHTML = '';
-            items.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${parseFloat(item.value).toFixed(2)}</td>
-                        <td>${parseFloat(item.total).toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editItem(${index})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteItem(${index})">Excluir</button>
-                        </td>
-                    </tr>
-                `;
-                itemTableBody.innerHTML += row;
-            });
-            calculateGrandTotal(); // Atualiza o Total Geral
+
+        // Função para calcular o Saldo Restante
+        function calculateRemainingBalance() {
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            const remaining = money - total;
+            remainingBalance.textContent = remaining.toFixed(2);
         }
-        
+
         // Adicionar Item
         addItemButton.addEventListener('click', () => {
             if (!itemName.value || !itemQuantity.value || !itemValue.value) {
@@ -123,38 +129,36 @@
             renderItems();
             clearForm();
         });
-        
-        // Editar Item
-        function editItem(index) {
-            const item = items[index];
-            itemName.value = item.name;
-            itemQuantity.value = item.quantity;
-            itemValue.value = item.value;
-            itemTotal.value = item.total;
-            
-            items.splice(index, 1);
-            localStorage.setItem('items', JSON.stringify(items));
-            renderItems();
+
+        // Atualizar Dinheiro Disponível
+        updateMoneyButton.addEventListener('click', () => {
+            money = parseFloat(availableMoney.value) || 0;
+            localStorage.setItem('money', money);
+            calculateRemainingBalance();
+        });
+
+        // Renderizar Itens
+        function renderItems() {
+            itemTableBody.innerHTML = '';
+            items.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${parseFloat(item.value).toFixed(2)}</td>
+                        <td>${parseFloat(item.total).toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editItem(${index})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem(${index})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+                itemTableBody.innerHTML += row;
+            });
+            calculateGrandTotal();
         }
-        
-        // Deletar Item
-        function deleteItem(index) {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
-                items.splice(index, 1);
-                localStorage.setItem('items', JSON.stringify(items));
-                renderItems();
-            }
-        }
-        
-        // Limpar Formulário
-        function clearForm() {
-            itemName.value = '';
-            itemQuantity.value = 1;
-            itemValue.value = '';
-            itemTotal.value = '';
-        }
-        
-        // Inicializar Lista
+
+        // Inicializar
         renderItems();
     </script>
 </body>
