@@ -153,6 +153,8 @@
         let items = JSON.parse(localStorage.getItem('items')) || [];
         let money = parseFloat(localStorage.getItem('money')) || 0;
 
+        const cardContainer = document.getElementById('cardContainer');
+        const itemTableBody = document.getElementById('itemTableBody');
         const availableMoney = document.getElementById('availableMoney');
         const remainingBalance = document.getElementById('remainingBalance');
         const grandTotal = document.getElementById('grandTotal');
@@ -168,20 +170,36 @@
             localStorage.setItem('items', JSON.stringify(items));
         }
 
+        function renderItems() {
+            itemTableBody.innerHTML = '';
+            cardContainer.innerHTML = '';
+
+            items.forEach(item => {
+                // Renderizar na tabela
+                itemTableBody.innerHTML += `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.value.toFixed(2)}</td>
+                    <td>${item.total.toFixed(2)}</td>
+                </tr>`;
+
+                // Renderizar nos cards
+                cardContainer.innerHTML += `<div class="item-card">
+                    <h5>${item.name}</h5>
+                    <p>Quantidade: ${item.quantity}</p>
+                    <p>Valor Unitário: ${item.value.toFixed(2)}</p>
+                    <p>Total Item: ${item.total.toFixed(2)}</p>
+                </div>`;
+            });
+
+            calculateGrandTotal();
+        }
+
         document.getElementById('updateMoney').addEventListener('click', () => {
             money = parseFloat(availableMoney.value) || 0;
             localStorage.setItem('money', money);
             calculateGrandTotal();
         });
-
-        function renderItems() {
-            const itemTableBody = document.getElementById('itemTableBody');
-            itemTableBody.innerHTML = '';
-            items.forEach(item => {
-                itemTableBody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.value}</td><td>${item.total}</td></tr>`;
-            });
-            calculateGrandTotal();
-        }
 
         renderItems();
     </script>
