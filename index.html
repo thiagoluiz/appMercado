@@ -14,7 +14,39 @@
             }
 
             .table th, .table td {
-                white-space: nowrap;
+                white-space: normal;
+                word-wrap: break-word;
+                font-size: 14px;
+            }
+
+            .table th:nth-child(1), 
+            .table td:nth-child(1) {
+                min-width: 120px;
+            }
+
+            .table th:nth-child(2), 
+            .table td:nth-child(2) {
+                min-width: 80px;
+            }
+
+            .table th:nth-child(3), 
+            .table td:nth-child(3) {
+                min-width: 100px;
+            }
+
+            .table th:nth-child(4), 
+            .table td:nth-child(4) {
+                min-width: 100px;
+            }
+
+            .table th:nth-child(5), 
+            .table td:nth-child(5) {
+                min-width: 120px;
+            }
+
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 12px;
             }
         }
     </style>
@@ -98,41 +130,10 @@
 
         let items = JSON.parse(localStorage.getItem('items')) || [];
         let money = parseFloat(localStorage.getItem('money')) || 0;
-        let totalGeneral = parseFloat(localStorage.getItem('totalGeneral')) || 0;
-        let remaining = parseFloat(localStorage.getItem('remaining')) || 0;
 
         availableMoney.value = money;
-        grandTotal.textContent = totalGeneral.toFixed(2);
-        remainingBalance.textContent = remaining.toFixed(2);
-
-        itemQuantity.addEventListener('input', calculateTotal);
-        itemValue.addEventListener('input', calculateTotal);
-
-        function calculateTotal() {
-            const quantity = parseFloat(itemQuantity.value) || 0;
-            const value = parseFloat(itemValue.value) || 0;
-            itemTotal.value = (quantity * value).toFixed(2);
-        }
-
-        function calculateGrandTotal() {
-            totalGeneral = items.reduce((sum, item) => sum + item.total, 0);
-            grandTotal.textContent = totalGeneral.toFixed(2);
-            localStorage.setItem('totalGeneral', totalGeneral);
-            calculateRemainingBalance();
-        }
-
-        function calculateRemainingBalance() {
-            remaining = money - totalGeneral;
-            remainingBalance.textContent = remaining.toFixed(2);
-            localStorage.setItem('remaining', remaining);
-        }
 
         addItemButton.addEventListener('click', () => {
-            if (!itemName.value || !itemQuantity.value || !itemValue.value) {
-                alert('Preencha todos os campos!');
-                return;
-            }
-
             const newItem = {
                 name: itemName.value,
                 quantity: parseInt(itemQuantity.value),
@@ -140,24 +141,9 @@
                 total: parseFloat(itemTotal.value)
             };
 
-            if (editIndex !== null) {
-                items[editIndex] = newItem;
-                editIndex = null;
-                addItemButton.textContent = 'Adicionar Item';
-            } else {
-                items.push(newItem);
-            }
-
+            items.push(newItem);
             localStorage.setItem('items', JSON.stringify(items));
             renderItems();
-            clearForm();
-        });
-
-        updateMoneyButton.addEventListener('click', () => {
-            money = parseFloat(availableMoney.value) || 0;
-            localStorage.setItem('money', money);
-            calculateRemainingBalance();
-            alert('Orçamento atualizado com sucesso!');
         });
 
         function renderItems() {
@@ -170,20 +156,11 @@
                         <td>${item.value.toFixed(2)}</td>
                         <td>${item.total.toFixed(2)}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editItem(${index})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteItem(${index})">Excluir</button>
+                            <button class="btn btn-sm btn-warning">Editar</button>
+                            <button class="btn btn-sm btn-danger">Excluir</button>
                         </td>
                     </tr>`;
             });
-            calculateGrandTotal();
-        }
-
-        function clearForm() {
-            itemName.value = '';
-            itemQuantity.value = 1;
-            itemValue.value = '';
-            itemTotal.value = '';
-            itemName.focus();
         }
 
         renderItems();
